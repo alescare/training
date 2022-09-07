@@ -9,6 +9,7 @@ public class Prenotazione {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     @Column(name = "data_inizio")
     private LocalDate dataInizio;
@@ -23,7 +24,7 @@ public class Prenotazione {
     private boolean approvata;
 
     @ManyToOne
-    @JoinColumn(name="veicolo", nullable=false)
+    @JoinColumn(name="auto", nullable=false)
     private Auto auto;
 
     public Prenotazione() {

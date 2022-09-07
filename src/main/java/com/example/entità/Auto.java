@@ -6,8 +6,12 @@ import java.util.Set;
 @Entity
 @Table(name = "veicolo")
 public class Auto {
+
     @Id
-    @Column(name = "targa")
+    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+    @Column(name = "targa", unique = true)
     private String targa;
     @Column(name = "costruttore")
     private String costruttore;
@@ -18,7 +22,7 @@ public class Auto {
     @Column(name = "tipologia")
     private String tipologia;
 
-    @OneToMany(mappedBy="veicolo")
+    @OneToMany(mappedBy="auto")
     private Set<Prenotazione> prenotazioni;
 
     public Auto() {

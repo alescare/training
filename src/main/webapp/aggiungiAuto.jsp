@@ -2,24 +2,52 @@
 <html>
 <body>
     <jsp:include page="header.jsp"/>
-    <c:choose>
-        <c:when test="${auto == null}">
-            Auto non inserita: targa già esistente.
-            <br/>
-        </c:when>
-    </c:choose>
-    <form action="/AggiungiAutoServlet" method="get">
+
+    <form action="/AutoServlet" method="get">
         Costruttore:<br/>
-        <input type="text" name="costruttore"><br/>
+        <input type="text" name="costruttore">
+        <br/><br/>
         Modello:<br/>
-        <input type="text" name="modello"> <br/>
+        <input type="text" name="modello">
+        <br/><br/>
         Targa:<br/>
-        <input type="text" name="targa"><br/>
+        <input type="text" name="targa">
+        <br/><br/>
         Tipologia:<br/>
-        <input type="text" name="tipologia"><br/>
+        <input type="text" name="tipologia">
+        <br/><br/>
         Anno di immatricolazione:<br/>
-        <input type="text" name="annoImmatricolazione"><br/>
-        <input type="submit" value="Aggiungi"/>
+        <input type="text" name="annoImmatricolazione">
+        <br/><br/>
+        <input type="submit" name="azione" value="Aggiungi"/>
     </form>
+
+    <hr>
+
+    <table>
+
+        <tr>
+            <th>Costruttore</th>
+            <th>Modello</th>
+            <th>Tipologia</th>
+            <th>Targa</th>
+            <th>Anno immatricolazione</th>
+
+        </tr>
+
+        <c:forEach var="auto" items="${listaAuto}">
+
+            <tr>
+                <td>${auto.costruttore}</td>
+                <td>${auto.modello}</td>
+                <td>${auto.tipologia}</td>
+                <td>${auto.targa}</td>
+                <td>${auto.anniImmatricolazione}</td>
+            </tr>
+
+        </c:forEach>
+
+    </table>
+
 </body>
 </html>

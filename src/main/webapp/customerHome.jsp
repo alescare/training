@@ -4,9 +4,13 @@
 <body>
     <jsp:include page="header.jsp"/>
 
-    <a href="VisualizzaProfilo">Visualizza profilo</a>
-    <br/>
-    <a href="prenotaAuto">Prenota auto</a>
+    <form action="/UtenteServlet" method="get">
+        <input type="submit" name="azione" value="Visualizza profilo">
+        <br/><br/>
+    </form>
+    <form action="/AutoServlet" method="get">
+        <input type="submit" name="azione" value="Prenota auto">
+    </form>
 
 </body>
 </html>

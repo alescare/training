@@ -13,7 +13,7 @@
             <th>Data fine</th>
         </tr>
 
-        <c:forEach var="listaPrenotazioni" items="${prenotazione}">
+        <c:forEach var="prenotazione" items="${listaPrenotazioni}">
 
             <tr>
                 <td>${prenotazione.auto.costruttore}</td>

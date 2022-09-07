@@ -8,8 +8,8 @@ import java.util.Set;
 @Table(name = "utente")
 public class Utente {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "nome")
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     @Column(name = "nome")
     private String nome;
@@ -32,6 +32,14 @@ public class Utente {
         this.cognome = cognome;
         this.dataNascita = dataNascita;
         this.admin = admin;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getNome() {

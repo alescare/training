@@ -3,18 +3,14 @@
 
 <body>
     <jsp:include page="header.jsp"/>
-    <c:if test = "${utente.nome == null}">
-        <h5 style="color: crimson">Utente non inserito: credenziali non valide.</h5>
-    </c:if>
 
-
-    <form action="/AggiungiUtenteServlet" method="get">
+    <form action="/UtenteServlet" method="get">
         Nome:<br/>
-        <input type="text" name="nome"><br/>
+        <input type="text" name="nome"><br/><br/>
         Cognome:<br/>
-        <input type="text" name="cognome"> <br/>
+        <input type="text" name="cognome"> <br/><br/>
         Data di nascita:<br/>
-        <input type="date" name="dataNascita"><br/>
+        <input type="date" name="dataNascita"><br/><br/>
         <input type="submit" value="Aggiungi"/>
     </form>
 </body>

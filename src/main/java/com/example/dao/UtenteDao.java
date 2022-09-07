@@ -9,20 +9,17 @@ import org.hibernate.Transaction;
 import java.time.LocalDate;
 
 public class UtenteDao {
-    private static Utente utente = new Utente("admin", "admin", LocalDate.now(), true);
+    private static Utente utente = new Utente("admin", "admin", null, true);
 
     static {
         UtenteDao utenteDao = new UtenteDao();
-        utenteDao.salvaUtente(utente);
+        utenteDao.salvaOAggiornaUtente(utente);
     }
-    public void salvaUtente(Utente utente) {
+    public void salvaOAggiornaUtente(Utente utente) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            // start a transaction
             transaction = session.beginTransaction();
-            // save the student object
-            session.save(utente);
-            // commit transaction
+            session.saveOrUpdate(utente);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {

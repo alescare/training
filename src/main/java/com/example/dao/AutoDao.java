@@ -11,15 +11,13 @@ import java.util.List;
 
 public class AutoDao {
 
-    public void salvaAuto(Auto auto) {
+    public void salvaOAggiornaAuto(Auto auto) {
         Transaction transaction = null;
 
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
             transaction = session.beginTransaction();
             session.saveOrUpdate(auto);
             transaction.commit();
-
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();

@@ -19,9 +19,9 @@
                 <td>${prenotazione.dataInizio}</td>
                 <td>${prenotazione.dataFine}</td>
                 <td>
-                    <form action = "/ApprovaPrenotazioniServlet" method="get">
-                        <input name="idPrenotazione" value= ${prenotazione.id}>
-                        <input type= "submit" name="auto" value= "Approva">
+                    <form action="/PrenotazioneServlet" method="get">
+                        <input type="hidden" name="idPrenotazione" value=${prenotazione.id}>
+                        <input type="submit" name="azione" value="Approva">
                     </form>
                 </td>
             </tr>

@@ -12,16 +12,16 @@
             <th>Azioni</th>
         </tr>
 
-        <c:forEach var="listaPrenotazioni" items="${prenotazione}">
+        <c:forEach var="prenotazione" items="${listaPrenotazioni}">
 
             <tr>
                 <td>${prenotazione.auto.targa}</td>
                 <td>${prenotazione.dataInizio}</td>
                 <td>${prenotazione.dataFine}</td>
                 <td>
-                    <form action = "/ApprovaPrenotazioniServlet" method="get">
-                        <input name="prenotazione" value= ${prenotazione.id}>
-                        <input type= "submit" value= "Cancella">
+                    <form action="/PrenotazioneServlet" method="get">
+                        <input type="hidden" name="prenotazione" value= ${prenotazione.id}>
+                        <input type="submit" name="azione" value="Cancella">
                     </form>
                 </td>
             </tr>

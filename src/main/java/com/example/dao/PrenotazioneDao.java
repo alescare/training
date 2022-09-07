@@ -11,11 +11,11 @@ import java.util.List;
 
 public class PrenotazioneDao {
 
-    public void salvaPrenotazione(Prenotazione prenotazione) {
+    public void salvaOAggiornaPrenotazione(Prenotazione prenotazione) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.save(prenotazione);
+            session.saveOrUpdate(prenotazione);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -45,22 +45,7 @@ public class PrenotazioneDao {
 
     public List<Prenotazione> getPrenotazioniUtente(Utente utente) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("from Prenotazione", Prenotazione.class).list();
-        }
-    }
-
-    public void approvaPrenotazione(Prenotazione prenotazione){
-        Transaction transaction = null;
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            transaction = session.beginTransaction();
-            prenotazione.setApprovata(true);
-            session.update(prenotazione);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
+            return session.createQuery("from Prenotazione where utente = '" + utente.getId() + "'", Prenotazione.class).list();
         }
     }
 
@@ -80,8 +65,8 @@ public class PrenotazioneDao {
 
     public List<Prenotazione> getListaPrenotazioniNelPeriodo(LocalDate dataInizio, LocalDate dataFine) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("from Prenotazione where not (data_inizio between dataInizio and dataFine ) " +
-                    "and not (data_fine between dataFine and dataFine)", Prenotazione.class).list();
+            return session.createQuery("from Prenotazione where not (data_inizio between '" + dataInizio + "' and '" + dataFine + "')" +
+                    " and not (data_fine between '" + dataInizio + "' and '" + dataFine + "')", Prenotazione.class).list();
         }
     }
 }

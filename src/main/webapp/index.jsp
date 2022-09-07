@@ -2,19 +2,16 @@
 <!DOCTYPE html>
 <html>
 <body>
-<form action="/LoginServlet" method="GET">
 
-    Nome: <input type="text" name="nome" />
-
+<form action="/UtenteServlet" method="GET">
+    Nome:<br/>
+    <input type="text" name="nome" />
     <br/><br/>
-
-    Cognome: <input type="text" name="cognome" />
-
+    Cognome:<br/>
+    <input type="text" name="cognome" />
     <br/><br/>
-
-    <input type="submit" value="Entra" />
-
-
+    <input type="submit" name="azione" value="Entra" />
 </form>
+
 </body>
 </html>
