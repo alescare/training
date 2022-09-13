@@ -3,14 +3,15 @@ package com.example.servlet;
 
 import com.example.dao.PrenotazioneDao;
 import com.example.dao.UtenteDao;
-import com.example.entità.Prenotazione;
-import com.example.entità.Utente;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.example.entita.Prenotazione;
+import com.example.entita.Utente;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -28,24 +29,18 @@ public class UtenteServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String azione= request.getParameter("azione");
-        switch (azione){
-            case "Aggiungi" :
-                aggiungi(request, response);
+        String azione = request.getParameter("azione");
+        switch (azione) {
+            case "Gestisci utenti":
+                gestisciUtenti(request, response);
                 break;
-            case "Aggiungi customer" :
-                aggiungiCustomer(request, response);
-                break;
-            case "Entra" :
-                entra(request, response);
-                break;
-            case "Visualizza profilo" :
+            case "Visualizza profilo":
                 visualizzaProfilo(request, response);
                 break;
-            case "Home" :
+            case "Home":
                 home(request, response);
                 break;
-            case "Esci" :
+            case "Esci":
                 esci(request, response);
                 break;
             default:
@@ -53,51 +48,75 @@ public class UtenteServlet extends HttpServlet {
 
     }
 
-    private void aggiungiCustomer(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String azione = request.getParameter("azione");
+        switch (azione) {
+            case "modifica credenziali":
+                modificaCredenziali(request, response);
+                break;
+            case "aggiungi utente":
+                aggiungi(request, response);
+                break;
+            case "Entra":
+                entra(request, response);
+                break;
+            case "cancella utente":
+                cancella(request, response);
+                break;
+            default:
+        }
+    }
+
+    private void gestisciUtenti(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        request.setAttribute("listaUtenti", new UtenteDao().listaUtenti());
         RequestDispatcher dispatcher =
-                request.getRequestDispatcher("/aggiungiCustomer.jsp");
+                request.getRequestDispatcher("/gestioneUtenti.jsp");
         dispatcher.forward(request, response);
 
     }
 
     private void aggiungi(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        UtenteDao utenteDao = new UtenteDao();
         Utente utente = new Utente();
         utente.setNome(request.getParameter("nome"));
         utente.setCognome(request.getParameter("cognome"));
+        utente.setUsername(request.getParameter("username"));
+        utente.setPassword(request.getParameter("password"));
         utente.setDataNascita(LocalDate.parse(request.getParameter("dataNascita")));
-        try{
-            utenteDao.salvaOAggiornaUtente(utente);
+        try {
+            new UtenteDao().salvaOAggiornaUtente(utente);
         } catch (Exception e) {
             utente = null;
         }
         request.setAttribute("utente", utente);
-        RequestDispatcher dispatcher =
-                request.getRequestDispatcher("/aggiungiUtente.jsp");
-        dispatcher.forward(request, response);
+        gestisciUtenti(request, response);
 
     }
 
     private void entra(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        UtenteDao utenteDao = new UtenteDao();
-
-        Utente utente = utenteDao.cercaUtentePerNomeCognome(request.getParameter("nome"), request.getParameter("cognome"));
-
+        Utente utente = new Utente();
         String jsp = "";
-
-        if (utente == null) {
-            jsp = "/loginFallito.jsp";
-        } else {
-            request.getSession().setAttribute("utenteLoggato", utente);
-            if (utente.isAdmin()) {
-                jsp = "/superUserHome.jsp";
-            } else {
-                jsp = "/customerHome.jsp";
-            }
+        try {
+            utente = new UtenteDao().cercaUtentePerCredenziali(request.getParameter("username"), request.getParameter("password"));
+        } catch (Exception e) {
+            jsp = "/index.jsp";
+            request.setAttribute("loginFallito", "Accesso non riuscito, riprova");
+            RequestDispatcher dispatcher =
+                    request.getRequestDispatcher(jsp);
+            dispatcher.forward(request, response);
         }
+
+        request.getSession().setAttribute("utenteLoggato", utente);
+        if (utente.isAdmin()) {
+            jsp = "/superUserHome.jsp";
+        } else {
+            jsp = "/customerHome.jsp";
+        }
+
         RequestDispatcher dispatcher =
                 request.getRequestDispatcher(jsp);
         dispatcher.forward(request, response);
@@ -117,7 +136,7 @@ public class UtenteServlet extends HttpServlet {
 
     private void home(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Utente utenteLoggato = (Utente) request.getSession().getAttribute("utenteLoggato");
-        if(utenteLoggato.isAdmin()) {
+        if (utenteLoggato.isAdmin()) {
             RequestDispatcher dispatcher =
                     request.getRequestDispatcher("/superUserHome.jsp");
             dispatcher.forward(request, response);
@@ -136,6 +155,32 @@ public class UtenteServlet extends HttpServlet {
                 request.getRequestDispatcher("/index.jsp");
         dispatcher.forward(request, response);
 
+    }
+
+    private void modificaCredenziali(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        Utente utente = (Utente) request.getSession().getAttribute("utenteLoggato");
+        UtenteDao utenteDao = new UtenteDao();
+        String password = request.getParameter("password");
+        String username = request.getParameter("username");
+        if (!(password.equals(utente.getPassword()))) {
+            utente.setPassword(password);
+            utenteDao.salvaOAggiornaUtente(utente);
+        }
+        if (!(username.equals(utente.getUsername()))) {
+            utente.setUsername(request.getParameter("username"));
+            utenteDao.salvaOAggiornaUtente(utente);
+        }
+        visualizzaProfilo(request, response);
+
+    }
+
+    private void cancella(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        UtenteDao utenteDao = new UtenteDao();
+        Utente utente = utenteDao.cercaUtentePerId(Integer.parseInt(request.getParameter("idUtente")));
+        utenteDao.cancellaUtente(utente);
+        gestisciUtenti(request, response);
     }
 
 }

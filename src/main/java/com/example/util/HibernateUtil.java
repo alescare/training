@@ -2,9 +2,9 @@ package com.example.util;
 
 import java.util.Properties;
 
-import com.example.entità.Prenotazione;
-import com.example.entità.Utente;
-import com.example.entità.Auto;
+import com.example.entita.Prenotazione;
+import com.example.entita.Utente;
+import com.example.entita.Auto;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
@@ -19,10 +19,9 @@ public class HibernateUtil {
             try {
                 Configuration configuration = new Configuration();
 
-                // Hibernate settings equivalent to hibernate.cfg.xml's properties
                 Properties settings = new Properties();
                 settings.put(Environment.DRIVER, "com.mysql.cj.jdbc.Driver");
-                settings.put(Environment.URL, "jdbc:mysql://localhost:3306/hibernate_db?useSSL=false");
+                settings.put(Environment.URL, "jdbc:mysql://localhost:3306/hibernate_db?serverTimezone=UTC&useSSL=false");
                 settings.put(Environment.USER, "root");
                 settings.put(Environment.PASS, "password");
                 settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL5Dialect");

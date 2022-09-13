@@ -1,6 +1,7 @@
-package com.example.entità;
+package com.example.entita;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -22,7 +23,7 @@ public class Auto {
     @Column(name = "tipologia")
     private String tipologia;
 
-    @OneToMany(mappedBy="auto")
+    @OneToMany(mappedBy = "auto", fetch = FetchType.EAGER)
     private Set<Prenotazione> prenotazioni;
 
     public Auto() {
@@ -76,5 +77,24 @@ public class Auto {
         this.prenotazioni = prenotazioni;
     }
 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Auto auto = (Auto) o;
+        return id == auto.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 }

@@ -3,15 +3,16 @@ package com.example.servlet;
 
 import com.example.dao.AutoDao;
 import com.example.dao.PrenotazioneDao;
-import com.example.entità.Auto;
-import com.example.entità.Prenotazione;
-import com.example.entità.Utente;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.example.entita.Auto;
+import com.example.entita.Prenotazione;
+import com.example.entita.Utente;
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -29,32 +30,40 @@ public class PrenotazioneServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        String azione= request.getParameter("azione");
-        switch (azione){
-            case "Approva prenotazioni" :
+        String azione = request.getParameter("azione");
+        switch (azione) {
+            case "prenotazioni da approvare":
                 approvaPrenotazioni(request, response);
                 break;
-            case "Approva" :
-                approva(request, response);
-                break;
-            case "Cancella":
-                cancella(request, response);
-                break;
-            case "Cancella prenotazioni":
+            case "prenotazioni da cancellare":
                 cancellaPrenotazioni(request, response);
                 break;
-            case  "Prenota" :
+            default:
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String azione = request.getParameter("azione");
+        switch (azione) {
+            case "approva prenotazione":
+                approva(request, response);
+                break;
+            case "cancella prenotazione":
+                cancella(request, response);
+                break;
+            case "prenota auto":
                 prenota(request, response);
                 break;
             default:
         }
     }
 
-    private void cancellaPrenotazioni(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
 
-        PrenotazioneDao prenotazioneDao = new PrenotazioneDao();
+    private void cancellaPrenotazioni(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        List<Prenotazione> listaPrenotazioni = prenotazioneDao.getPrenotazioni();
+        List<Prenotazione> listaPrenotazioni = new PrenotazioneDao().getPrenotazioni();
 
         request.setAttribute("listaPrenotazioni", listaPrenotazioni);
 
@@ -66,12 +75,8 @@ public class PrenotazioneServlet extends HttpServlet {
 
     private void approvaPrenotazioni(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        PrenotazioneDao prenotazioneDao = new PrenotazioneDao();
-
-        List<Prenotazione> listaPrenotazioni = prenotazioneDao.getPrenotazioniDaApprovare();
-
+        List<Prenotazione> listaPrenotazioni = new PrenotazioneDao().getPrenotazioniDaApprovare();
         request.setAttribute("listaPrenotazioni", listaPrenotazioni);
-
         RequestDispatcher dispatcher =
                 request.getRequestDispatcher("/approvaPrenotazioni.jsp");
         dispatcher.forward(request, response);
@@ -81,15 +86,10 @@ public class PrenotazioneServlet extends HttpServlet {
     private void approva(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         PrenotazioneDao prenotazioneDao = new PrenotazioneDao();
-
         Prenotazione prenotazione = prenotazioneDao.getPrenotazione(Integer.parseInt(request.getParameter("idPrenotazione")));
-
         prenotazione.setApprovata(true);
-
         prenotazioneDao.salvaOAggiornaPrenotazione(prenotazione);
-
         List<Prenotazione> listaPrenotazioni = prenotazioneDao.getPrenotazioniDaApprovare();
-
         request.setAttribute("listaPrenotazioni", listaPrenotazioni);
 
         RequestDispatcher dispatcher =
@@ -100,26 +100,16 @@ public class PrenotazioneServlet extends HttpServlet {
     private void cancella(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         PrenotazioneDao prenotazioneDao = new PrenotazioneDao();
-
         Prenotazione prenotazione = prenotazioneDao.getPrenotazione(Integer.parseInt(request.getParameter("prenotazione")));
-
         prenotazioneDao.cancellaPrenotazione(prenotazione);
-
-        List<Prenotazione> listaPrenotazioni = prenotazioneDao.getPrenotazioni();
-
-        request.setAttribute("listaPrenotazioni", listaPrenotazioni);
-
-        RequestDispatcher dispatcher =
-                request.getRequestDispatcher("/cancellaPrenotazioni.jsp");
-        dispatcher.forward(request, response);
+        cancellaPrenotazioni(request, response);
 
     }
 
     private void prenota(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         PrenotazioneDao prenotazioneDao = new PrenotazioneDao();
-        AutoDao autoDao = new AutoDao();
-        Auto auto = autoDao.getAutoPerId(Integer.parseInt(request.getParameter("idAuto")));
+        Auto auto = new AutoDao().getAutoPerId(Integer.parseInt(request.getParameter("idAuto")));
         Utente utente = (Utente) request.getSession().getAttribute("utenteLoggato");
         Prenotazione prenotazione = new Prenotazione();
         prenotazione.setAuto(auto);
@@ -129,6 +119,7 @@ public class PrenotazioneServlet extends HttpServlet {
         prenotazioneDao.salvaOAggiornaPrenotazione(prenotazione);
         request.getSession().removeAttribute("dataInizio");
         request.getSession().removeAttribute("dataFine");
+        request.setAttribute("listaPrenotazioni", prenotazioneDao.getPrenotazioniUtente(utente));
         RequestDispatcher dispatcher =
                 request.getRequestDispatcher("/profilo.jsp");
         dispatcher.forward(request, response);

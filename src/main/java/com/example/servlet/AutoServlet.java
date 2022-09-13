@@ -2,14 +2,17 @@ package com.example.servlet;
 
 
 import com.example.dao.AutoDao;
-import com.example.entità.Auto;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import com.example.dao.PrenotazioneDao;
+import com.example.entita.Auto;
+import com.example.entita.Utente;
 
+
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,82 +32,116 @@ public class AutoServlet extends HttpServlet {
 
         String azione= request.getParameter("azione");
         switch (azione){
-            case "Aggiungi":
-                aggiungi(request, response);
-                break;
-            case "Cerca":
-                cerca(request, response);
-                break;
-            case "Prenota auto":
+            case "pagina di prenotazione auto":
                 prenotaAuto(request, response);
                 break;
-            case "Aggiungi auto":
-                aggiungiAuto(request, response);
+            case "Gestisci auto":
+                gestisciAuto(request, response);
                 break;
             default:
         }
 
     }
 
-    private void aggiungiAuto(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        AutoDao autoDao = new AutoDao();
-        List<Auto> listaAuto = autoDao.getListaAuto();
-        request.setAttribute("listaAuto", listaAuto);
-        RequestDispatcher dispatcher =
-                request.getRequestDispatcher("/aggiungiAuto.jsp");
-        dispatcher.forward(request, response);
+        String azione= request.getParameter("azione");
+        switch (azione){
+            case "Salva":
+                salva(request, response);
+                break;
+            case "cerca auto disponibili":
+                cerca(request, response);
+                break;
+            case "elimina auto":
+                elimina(request, response);
+                break;
+            case "modifica auto":
+                modifica(request, response);
+                break;
+            default:
+        }
+
     }
 
-    private void aggiungi(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        AutoDao autoDao = new AutoDao();
+    private void salva(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        //comprende sia la creazione di una nuova auto sia la modifica di una già esistente
         Auto auto = new Auto();
         auto.setModello(request.getParameter("modello"));
         auto.setCostruttore(request.getParameter("costruttore"));
-        auto.setTarga(request.getParameter("targa"));
         auto.setTipologia(request.getParameter("tipologia"));
+        auto.setTarga(request.getParameter("targa"));
         auto.setAnnoImmatricolazione(Integer.parseInt(request.getParameter("annoImmatricolazione")));
-        try{
-            autoDao.salvaOAggiornaAuto(auto);
-        } catch (Exception e) {
-            auto = null;
+        String id = request.getParameter("idAutoDaModificare");
+        if (!("".equals(id))){
+            auto.setId(Integer.parseInt(id));
         }
-        List<Auto> listaAuto = autoDao.getListaAuto();
+        new AutoDao().salvaOAggiornaAuto(auto);
+        gestisciAuto(request, response);
+
+    }
+
+    private void modifica(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        Auto auto = new AutoDao().getAutoPerId(Integer.parseInt(request.getParameter("idAuto")));
+        request.setAttribute("autoDaModificare", auto);
+        gestisciAuto(request, response);
+
+    }
+
+    private void gestisciAuto(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+
+        List<Auto> listaAuto = new AutoDao().getListaAuto();
         request.setAttribute("listaAuto", listaAuto);
-        request.setAttribute("auto", auto);
         RequestDispatcher dispatcher =
-                request.getRequestDispatcher("/aggiungiAuto.jsp");
+                request.getRequestDispatcher("/gestioneAuto.jsp");
         dispatcher.forward(request, response);
+    }
+
+
+    private void elimina(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        AutoDao autoDao = new AutoDao();
+        Auto auto = autoDao.getAutoPerId(Integer.parseInt(request.getParameter("idAuto")));
+        autoDao.cancellaAuto(auto);
+        gestisciAuto(request, response);
 
     }
 
     private void cerca(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        AutoDao autoDao = new AutoDao();
         if (request.getParameter("idAuto") == null) {
             LocalDate dataInizio = LocalDate.parse(request.getParameter("dataInizio"));
             LocalDate dataFine = LocalDate.parse(request.getParameter("dataFine"));
             List<Auto> listaAutoDisponibili = new ArrayList<>();
 
             try {
-                listaAutoDisponibili = autoDao.listaAutoDisponibiliNelPeriodo(dataInizio, dataFine);
+                listaAutoDisponibili = new AutoDao().listaAutoDisponibiliNelPeriodo(dataInizio, dataFine);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             request.getSession().setAttribute("dataInizio", dataInizio);
             request.getSession().setAttribute("dataFine", dataFine);
             request.setAttribute("listaAutoDisponibili", listaAutoDisponibili);
-            RequestDispatcher dispatcher =
-                    request.getRequestDispatcher("/prenotaAuto.jsp");
-            dispatcher.forward(request, response);
+            prenotaAuto(request, response);
         }
     }
 
     private void prenotaAuto(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+        Utente utente = (Utente) request.getSession().getAttribute("utenteLoggato");
+        String jsp = "";
+        if (new PrenotazioneDao().prenotazioneInCorsoUtente(utente)) {
+            request.setAttribute("prenotazioneInCorso", "Hai già una prenotazione in corso");
+            jsp = "/customerHome.jsp";
+        } else {
+            jsp = "/prenotaAuto.jsp";
+        }
         RequestDispatcher dispatcher =
-                request.getRequestDispatcher("/prenotaAuto.jsp");
+                request.getRequestDispatcher(jsp);
         dispatcher.forward(request, response);
 
     }

@@ -2,48 +2,50 @@
 <html>
 
 <body>
-    <jsp:include page="header.jsp"/>
+<jsp:include page="header.jsp"/>
 
-    <form action = "/AutoServlet" method="get">
+<form action="AutoServlet" method="post">
 
-        Data inizio: <input type="date" name="dataInizio"><br/>
-        Data fine: <input type="date" name="dataFine"><br/>
-        <input type="submit" name="azione" value="Cerca">
+    Data inizio: <input type="date" name="dataInizio" value="${sessionScope.dataInizio}"><br/>
+    Data fine: <input type="date" name="dataFine" value="${sessionScope.dataFine}"><br/>
+    <input type="hidden" name="azione" value="cerca auto disponibili">
+    <input type="submit" value="Cerca">
 
-    </form>
+</form>
 
-    <hr>
+<hr>
 
-    <c:if test="${request.getParameter(dataInizio) != null && request.getParameter(dataFine) != null}">
-        <table>
+<c:if test="${sessionScope.dataInizio != null && sessionScope.dataFine != null}">
+<table style="text-align: center" border="3">
 
-            <tr>
-                <th>Costruttore</th>
-                <th>Modello</th>
-                <th>Tipologia</th>
-                <th>Anno immatricolazione</th>
-                <th>Azioni</th>
-            </tr>
+    <tr>
+        <th>Costruttore</th>
+        <th>Modello</th>
+        <th>Tipologia</th>
+        <th>Anno immatricolazione</th>
+        <th>Azioni</th>
+    </tr>
 
-            <c:forEach var="auto" items="${listaAutoDisponibili}">
+    <c:forEach var="auto" items="${listaAutoDisponibili}">
 
-                <tr>
-                    <td>${auto.costruttore}</td>
-                    <td>${auto.modello}</td>
-                    <td>${auto.tipologia}</td>
-                    <td>${auto.annoImmatricolazione}</td>
-                    <td>
-                        <form action="/PrenotazioneServlet" method="get">
-                            <input type="hidden" name="idAuto" value${auto.id}>
-                            <input type="submit" name="azione" value="Prenota">
-                        </form>
-                    </td>
-                </tr>
+        <tr>
+            <td>${auto.costruttore}</td>
+            <td>${auto.modello}</td>
+            <td>${auto.tipologia}</td>
+            <td>${auto.annoImmatricolazione}</td>
+            <td>
+                <form action="PrenotazioneServlet" method="post">
+                    <input type="hidden" name="idAuto" value="${auto.id}">
+                    <input type="hidden" name="azione" value="prenota auto">
+                    <input type="submit" name="azione" value="Prenota">
+                </form>
+            </td>
+        </tr>
 
-            </c:forEach>
-        </c:if>
+    </c:forEach>
+    </c:if>
 
-    </table>
+</table>
 
 </body>
 </html>

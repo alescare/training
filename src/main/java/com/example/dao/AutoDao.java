@@ -1,7 +1,7 @@
 package com.example.dao;
 
-import com.example.entità.Auto;
-import com.example.entità.Prenotazione;
+import com.example.entita.Auto;
+import com.example.entita.Prenotazione;
 import com.example.util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -26,6 +26,21 @@ public class AutoDao {
         }
     }
 
+    public void cancellaAuto(Auto auto) {
+        Transaction transaction = null;
+
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            transaction = session.beginTransaction();
+            session.delete(auto);
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        }
+    }
+
     public List<Auto> getListaAuto() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("from Auto", Auto.class).list();
@@ -40,8 +55,7 @@ public class AutoDao {
 
     public List<Auto> listaAutoDisponibiliNelPeriodo(LocalDate dataInizio, LocalDate dataFine) {
         List<Auto> listaAutodisponibili = getListaAuto();
-        PrenotazioneDao prenotazioneDao = new PrenotazioneDao();
-        List<Prenotazione> listaPrenotazioni = prenotazioneDao.getListaPrenotazioniNelPeriodo(dataInizio, dataFine);
+        List<Prenotazione> listaPrenotazioni = new PrenotazioneDao().getListaPrenotazioniNelPeriodo(dataInizio, dataFine);
         for (Prenotazione prenotazione : listaPrenotazioni) {
             listaAutodisponibili.remove(prenotazione.getAuto());
         }

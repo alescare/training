@@ -1,4 +1,4 @@
-package com.example.entità;
+package com.example.entita;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -16,15 +16,15 @@ public class Prenotazione {
     @Column(name = "data_fine")
     private LocalDate dataFine;
 
-    @ManyToOne
-    @JoinColumn(name="utente", nullable=false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "utente", nullable = false)
     private Utente utente;
 
     @Column(name = "approvata")
     private boolean approvata;
 
-    @ManyToOne
-    @JoinColumn(name="auto", nullable=false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "auto", nullable = false)
     private Auto auto;
 
     public Prenotazione() {
