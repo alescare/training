@@ -6,8 +6,8 @@
 
 <form action="AutoServlet" method="post">
 
-    Data inizio: <input type="date" name="dataInizio" value="${sessionScope.dataInizio}"><br/>
-    Data fine: <input type="date" name="dataFine" value="${sessionScope.dataFine}"><br/>
+    Data inizio: <input type="date" name="dataInizio" value="${param.dataInizio}"><br/>
+    Data fine: <input type="date" name="dataFine" value="${param.dataFine}"><br/>
     <input type="hidden" name="azione" value="cerca auto disponibili">
     <input type="submit" value="Cerca">
 
@@ -15,7 +15,7 @@
 
 <hr>
 
-<c:if test="${sessionScope.dataInizio != null && sessionScope.dataFine != null}">
+<c:if test="${param.dataInizio != null && param.dataFine != null}">
 <table style="text-align: center" border="3">
 
     <tr>

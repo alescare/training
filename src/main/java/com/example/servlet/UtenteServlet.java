@@ -1,6 +1,7 @@
 package com.example.servlet;
 
 
+import com.example.dao.AutoDao;
 import com.example.dao.PrenotazioneDao;
 import com.example.dao.UtenteDao;
 import com.example.entita.Prenotazione;
@@ -21,6 +22,9 @@ import java.util.List;
 @WebServlet(value = "/UtenteServlet")
 public class UtenteServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
+
+    private PrenotazioneDao prenotazioneDao = PrenotazioneDao.getInstance();
+    private UtenteDao utenteDao = UtenteDao.getInstance();
 
     public UtenteServlet() {
         super();
@@ -71,7 +75,7 @@ public class UtenteServlet extends HttpServlet {
 
     private void gestisciUtenti(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        request.setAttribute("listaUtenti", new UtenteDao().listaUtenti());
+        request.setAttribute("listaUtenti", utenteDao.listaUtenti());
         RequestDispatcher dispatcher =
                 request.getRequestDispatcher("/gestioneUtenti.jsp");
         dispatcher.forward(request, response);
@@ -87,7 +91,7 @@ public class UtenteServlet extends HttpServlet {
         utente.setPassword(request.getParameter("password"));
         utente.setDataNascita(LocalDate.parse(request.getParameter("dataNascita")));
         try {
-            new UtenteDao().salvaOAggiornaUtente(utente);
+            utenteDao.salvaOAggiornaUtente(utente);
         } catch (Exception e) {
             utente = null;
         }
@@ -101,7 +105,7 @@ public class UtenteServlet extends HttpServlet {
         Utente utente = new Utente();
         String jsp = "";
         try {
-            utente = new UtenteDao().cercaUtentePerCredenziali(request.getParameter("username"), request.getParameter("password"));
+            utente = utenteDao.cercaUtentePerCredenziali(request.getParameter("username"), request.getParameter("password"));
         } catch (Exception e) {
             jsp = "/index.jsp";
             request.setAttribute("loginFallito", "Accesso non riuscito, riprova");
@@ -125,7 +129,6 @@ public class UtenteServlet extends HttpServlet {
     private void visualizzaProfilo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         Utente utente = (Utente) request.getSession().getAttribute("utenteLoggato");
-        PrenotazioneDao prenotazioneDao = new PrenotazioneDao();
         List<Prenotazione> listaPrenotazioni = prenotazioneDao.getPrenotazioniUtente(utente);
         request.setAttribute("listaPrenotazioni", listaPrenotazioni);
         RequestDispatcher dispatcher =
@@ -160,7 +163,6 @@ public class UtenteServlet extends HttpServlet {
     private void modificaCredenziali(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         Utente utente = (Utente) request.getSession().getAttribute("utenteLoggato");
-        UtenteDao utenteDao = new UtenteDao();
         String password = request.getParameter("password");
         String username = request.getParameter("username");
         if (!(password.equals(utente.getPassword()))) {
@@ -177,7 +179,6 @@ public class UtenteServlet extends HttpServlet {
 
     private void cancella(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        UtenteDao utenteDao = new UtenteDao();
         Utente utente = utenteDao.cercaUtentePerId(Integer.parseInt(request.getParameter("idUtente")));
         utenteDao.cancellaUtente(utente);
         gestisciUtenti(request, response);

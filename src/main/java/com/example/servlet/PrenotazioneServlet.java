@@ -23,6 +23,8 @@ import java.util.List;
 public class PrenotazioneServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
+    private PrenotazioneDao prenotazioneDao = PrenotazioneDao.getInstance();
+    private AutoDao autoDao = AutoDao.getInstance();
     public PrenotazioneServlet() {
         super();
     }
@@ -63,7 +65,7 @@ public class PrenotazioneServlet extends HttpServlet {
 
     private void cancellaPrenotazioni(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        List<Prenotazione> listaPrenotazioni = new PrenotazioneDao().getPrenotazioni();
+        List<Prenotazione> listaPrenotazioni = prenotazioneDao.getPrenotazioni();
 
         request.setAttribute("listaPrenotazioni", listaPrenotazioni);
 
@@ -75,7 +77,7 @@ public class PrenotazioneServlet extends HttpServlet {
 
     private void approvaPrenotazioni(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        List<Prenotazione> listaPrenotazioni = new PrenotazioneDao().getPrenotazioniDaApprovare();
+        List<Prenotazione> listaPrenotazioni = prenotazioneDao.getPrenotazioniDaApprovare();
         request.setAttribute("listaPrenotazioni", listaPrenotazioni);
         RequestDispatcher dispatcher =
                 request.getRequestDispatcher("/approvaPrenotazioni.jsp");
@@ -85,7 +87,6 @@ public class PrenotazioneServlet extends HttpServlet {
 
     private void approva(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        PrenotazioneDao prenotazioneDao = new PrenotazioneDao();
         Prenotazione prenotazione = prenotazioneDao.getPrenotazione(Integer.parseInt(request.getParameter("idPrenotazione")));
         prenotazione.setApprovata(true);
         prenotazioneDao.salvaOAggiornaPrenotazione(prenotazione);
@@ -99,8 +100,7 @@ public class PrenotazioneServlet extends HttpServlet {
 
     private void cancella(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        PrenotazioneDao prenotazioneDao = new PrenotazioneDao();
-        Prenotazione prenotazione = prenotazioneDao.getPrenotazione(Integer.parseInt(request.getParameter("prenotazione")));
+        Prenotazione prenotazione = prenotazioneDao.getPrenotazione(Integer.parseInt(request.getParameter("idPrenotazione")));
         prenotazioneDao.cancellaPrenotazione(prenotazione);
         cancellaPrenotazioni(request, response);
 
@@ -108,17 +108,14 @@ public class PrenotazioneServlet extends HttpServlet {
 
     private void prenota(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        PrenotazioneDao prenotazioneDao = new PrenotazioneDao();
-        Auto auto = new AutoDao().getAutoPerId(Integer.parseInt(request.getParameter("idAuto")));
+        Auto auto = autoDao.getAutoPerId(Integer.parseInt(request.getParameter("idAuto")));
         Utente utente = (Utente) request.getSession().getAttribute("utenteLoggato");
         Prenotazione prenotazione = new Prenotazione();
         prenotazione.setAuto(auto);
         prenotazione.setUtente(utente);
-        prenotazione.setDataInizio((LocalDate) request.getSession().getAttribute("dataInizio"));
-        prenotazione.setDataFine((LocalDate) request.getSession().getAttribute("dataFine"));
+        prenotazione.setDataInizio(LocalDate.parse(request.getParameter("dataInizio")));
+        prenotazione.setDataFine(LocalDate.parse(request.getParameter("dataFine")));
         prenotazioneDao.salvaOAggiornaPrenotazione(prenotazione);
-        request.getSession().removeAttribute("dataInizio");
-        request.getSession().removeAttribute("dataFine");
         request.setAttribute("listaPrenotazioni", prenotazioneDao.getPrenotazioniUtente(utente));
         RequestDispatcher dispatcher =
                 request.getRequestDispatcher("/profilo.jsp");

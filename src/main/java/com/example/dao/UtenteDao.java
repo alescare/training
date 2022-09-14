@@ -11,6 +11,14 @@ import java.util.List;
 
 public class UtenteDao {
 
+    private static UtenteDao instance = new UtenteDao();
+
+    private UtenteDao() {
+    }
+
+    public static UtenteDao getInstance(){
+        return instance;
+    }
 
     static {
         Utente admin = new Utente("admin", "admin", true);

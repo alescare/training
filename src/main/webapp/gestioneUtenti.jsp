@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <html>
 
 <body>
@@ -41,7 +42,10 @@
         <tr>
             <td>${utente.nome}</td>
             <td>${utente.cognome}</td>
-            <td>${utente.dataNascita}</td>
+            <td>
+                <fmt:parseDate pattern="yyyy-MM-dd" value="${utente.dataNascita}" var="dataNascitaform"/>
+                <fmt:formatDate pattern="dd/MM/yyyy" value="${dataNascitaform}"/>
+            </td>
             <td>${utente.username}</td>
             <td>
                 <form action="UtenteServlet" method="post">

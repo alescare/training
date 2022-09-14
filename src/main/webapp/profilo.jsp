@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <html>
 
 <body>
@@ -7,7 +8,10 @@
 <h4>Dati anagrafici utente:</h4>
 <h5>Nome: ${sessionScope.utenteLoggato.nome}</h5>
 <h5>Cognome: ${sessionScope.utenteLoggato.cognome}</h5>
-<h5>Data di nascita: ${sessionScope.utenteLoggato.dataNascita}</h5>
+<h5>Data di nascita:
+    <fmt:parseDate pattern="yyyy-MM-dd" value="${sessionScope.utenteLoggato.dataNascita}" var="dataNascitaform"/>
+    <fmt:formatDate pattern="dd/MM/yyyy" value="${dataNascitaform}"/>
+</h5>
 
 <hr>
 
@@ -44,8 +48,13 @@
             <td>${prenotazione.auto.costruttore}</td>
             <td>${prenotazione.auto.modello}</td>
             <td>${prenotazione.auto.targa}</td>
-            <td>${prenotazione.dataInizio}</td>
-            <td>${prenotazione.dataFine}</td>
+            <td><fmt:parseDate pattern="yyyy-MM-dd" value="${prenotazione.dataInizio}" var="dataInizioForm"/>
+                <fmt:formatDate pattern="dd/MM/yyyy" value="${dataInizioForm}"/>
+            </td>
+            <td>
+                <fmt:parseDate pattern="yyyy-MM-dd" value="${prenotazione.dataFine}" var="dataFineform"/>
+                <fmt:formatDate pattern="dd/MM/yyyy" value="${dataFineform}"/>
+            </td>
             <td>
                 <c:choose>
                     <c:when test="${prenotazione.approvata}">SI</c:when>

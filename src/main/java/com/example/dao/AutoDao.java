@@ -11,6 +11,16 @@ import java.util.List;
 
 public class AutoDao {
 
+    private static AutoDao instance = new AutoDao();
+    private PrenotazioneDao prenotazioneDao = PrenotazioneDao.getInstance();
+
+    private AutoDao() {
+    }
+
+    public static AutoDao getInstance(){
+        return instance;
+    }
+
     public void salvaOAggiornaAuto(Auto auto) {
         Transaction transaction = null;
 
@@ -55,7 +65,7 @@ public class AutoDao {
 
     public List<Auto> listaAutoDisponibiliNelPeriodo(LocalDate dataInizio, LocalDate dataFine) {
         List<Auto> listaAutodisponibili = getListaAuto();
-        List<Prenotazione> listaPrenotazioni = new PrenotazioneDao().getListaPrenotazioniNelPeriodo(dataInizio, dataFine);
+        List<Prenotazione> listaPrenotazioni = prenotazioneDao.getListaPrenotazioniNelPeriodo(dataInizio, dataFine);
         for (Prenotazione prenotazione : listaPrenotazioni) {
             listaAutodisponibili.remove(prenotazione.getAuto());
         }

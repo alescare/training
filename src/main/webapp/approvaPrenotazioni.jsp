@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <html>
 
 <body>
@@ -16,13 +17,18 @@
 
         <tr>
             <td>${prenotazione.auto.targa}</td>
-            <td>${prenotazione.dataInizio}</td>
-            <td>${prenotazione.dataFine}</td>
+            <td><fmt:parseDate pattern="yyyy-MM-dd" value="${prenotazione.dataInizio}" var="dataInizioForm"/>
+                <fmt:formatDate pattern="dd/MM/yyyy" value="${dataInizioForm}"/>
+            </td>
+            <td>
+                <fmt:parseDate pattern="yyyy-MM-dd" value="${prenotazione.dataFine}" var="dataFineform"/>
+                <fmt:formatDate pattern="dd/MM/yyyy" value="${dataFineform}"/>
+            </td>
             <td>
                 <form action="PrenotazioneServlet" method="post">
                     <input type="hidden" name="idPrenotazione" value=${prenotazione.id}>
                     <input type="hidden" name="azione" value="approva prenotazione">
-                    <input type="submit"  value="Approva">
+                    <input type="submit" value="Approva">
                 </form>
             </td>
         </tr>
